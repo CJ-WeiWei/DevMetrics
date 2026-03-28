@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
@@ -6,6 +6,23 @@ import './App.css'
 
 function App() {
   const [count, setCount] = useState(0)
+  const [message, setMessage] = useState<string>('Loading...');
+  const [status, setStatus] = useState<string>('');
+  useEffect(() => {
+    // Fetch from your backend when component loads
+    fetch('http://localhost:8000/api/health')
+      .then(response => response.json())
+      .then(data => {
+        setMessage(data.message || data.status);
+        setStatus('Connected to backend');
+      })
+      .catch(error => {
+        console.error('Error fetching from backend:', error);
+        setMessage('Failed to connect to backend');
+        setStatus('Make sure backend is running on port 8000');
+      });
+  }, []);
+
 
   return (
     <>
@@ -27,6 +44,11 @@ function App() {
         >
           Count is {count}
         </button>
+        <div style={{ marginTop: '20px', padding: '10px', borderTop: '1px solid #ccc' }}>
+          <h3>Backend Status:</h3>
+          <p>Status: {status}</p>
+          <p>Backend says: {message}</p>
+        </div>
       </section>
 
       <div className="ticks"></div>
